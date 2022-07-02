@@ -1,0 +1,40 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: ensure nginx is at the latest version
+      ansible.builtin.apt: 
+        name: nginx
+        state: latest
+    - name: copying
+      ansible.builtin.copy:
+        src: /home/rigil/Downloads/beginner-html-site-styled-gh-pages.zip 
+        dest: /var/www/
+      
+    - name: unzip
+      ansible.builtin.unarchive:
+       src: /var/www/beginner-html-site-styled-gh-pages.zip
+       dest: /var/www/
+       remote_src: yes
+      notify:
+        -unziped
+    
+
+    - name: copy
+      ansible.builtin.copy:
+        remote_src: yes
+        src: /var/www/beginner-html-site-styled-gh-pages/
+        dest: /var/www/html/  
+      notify:
+        -Restart apache
+
+    - name: nginx started
+      service: 
+        name: nginx
+        state: restarted        
+  handlers:
+    - name: copying
+      ansible.builtin.unarchive:
+        src: /var/www/beginner-html-site-styled-gh-pages.zip
+        dest: /var/www/
+ 
